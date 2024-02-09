@@ -7,10 +7,24 @@ ca = ssh_ca.ca(base)
 
 app = Flask(__name__)
 
+def reply(data):
+    resp = Response()
+    if data is None:
+        resp.status = '404'
+        return resp
+    else:
+        resp.status = '200'
+        resp.set_data(data)
+        return resp
+
+def sign(token, profile):
+    certfile = ca.sign(f"users/{token}.pub", profile)
+    with open(certfile, "r") as f:
+        return f.read()
+
 @app.route("/keys", methods=['POST'])
 def webhook_post_key():
     token = request.headers["token"]
-    print(f"POST token={token}")
     with open(f"users/{token}.pub", "w") as f:
         f.write(request.data.decode("utf-8"))
     resp = Response()
@@ -20,11 +34,9 @@ def webhook_post_key():
 @app.route("/certs", methods=['GET'])
 def webhook_get_cert():
     token = request.headers["token"]
-    print(f"GET token={token}")
     profile = ca.profile(token)
     if profile == {}:
-        return "PROFILE NOT FOUND"
-    certfile = ca.sign(f"users/{token}.pub", profile)
-    with open(certfile, "r") as f:
-        cert = f.read()
-    return cert
+        return reply(None)
+    else:
+        cert = sign(token, profile)
+        return reply(cert)
