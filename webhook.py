@@ -1,6 +1,6 @@
 import os
+import ssh_ca
 from flask import Flask, request, Response, redirect
-from . import ssh_ca
 
 base = os.path.dirname(os.path.realpath(__file__))
 ca = ssh_ca.ca(base)
