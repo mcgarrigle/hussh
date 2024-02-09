@@ -12,7 +12,7 @@ USER_CA="${HERE}/ca/user_ca_key"
 #
 
 function command_init {
-  mkdir -p "${HERE}/ca" "${HERE}/hosts" "${HERE}/profiles" "${HERE}/users"
+  mkdir -p "${HERE}/ca" "${HERE}/keys" "${HERE}/hosts" "${HERE}/profiles" "${HERE}/users"
 
   ssh-keygen -t ecdsa -f ${HOST_CA} \
     -C "Host Certficate Authority for *.${DOMAIN}"

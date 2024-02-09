@@ -4,6 +4,7 @@ import sys
 import os
 import re
 import yaml
+import hashlib
 import subprocess
 from itertools import chain
 from pprint import pprint
@@ -19,6 +20,13 @@ class ca:
             return {}
         with open(path) as f:
             return yaml.safe_load(f.read())
+
+    def key(self, data):
+        digest = hashlib.sha256(data).hexdigest()
+        path = os.path.join(self.base, 'keys', f"{digest}.pub")
+        with open(path, "w") as f:
+            f.write(data.decode("utf-8"))
+        return digest
 
     def sign(self, keyfile, profile):
         principals = ",".join(profile["principals"])
