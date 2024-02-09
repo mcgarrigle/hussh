@@ -1,0 +1,4 @@
+while true; do
+  watch -g ls -lr
+  sleep 4
+done

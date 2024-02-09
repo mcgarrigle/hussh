@@ -1,0 +1,51 @@
+#!/usr/bin/bash
+
+THIS=$(realpath "$0")
+HERE=$(dirname "${THIS}")
+
+DOMAIN="${DOMAIN:-mac.wales}"
+
+HOST_CA="${HERE}/ca/host_ca_key"
+USER_CA="${HERE}/ca/user_ca_key"
+
+# --------------------------------------
+#
+
+function command_host_sign {
+  local HOST="$1"
+  scp "${HOST}:/etc/ssh/ssh_host_ecdsa_key.pub" "${HERE}/hosts/${HOST}.pub"
+  ssh-keygen \
+    -h \
+    -s ${HOST_CA} \
+    -V '+1d' \
+    -I abcd \
+    -z 00001 \
+    -n "${HOST}" \
+    "${HERE}/hosts/${HOST}.pub"
+}
+
+function command_user_sign {
+  local NAME="${1:-$USER}"
+  ssh-keygen \
+    -V '+24h' \
+    -s ${USER_CA} \
+    -I 'edcba' \
+    -z '0004' \
+    -n ${NAME} \
+    "${HOME}/.ssh/id_ed25519.pub"
+  ssh-keygen -Lf "${HOME}/.ssh/id_ed25519-cert.pub"
+}
+
+function command_init {
+  ssh-keygen -t ecdsa -f ${HOST_CA} \
+    -C "Host Certficate Authority for *.${DOMAIN}"
+  ssh-keygen -t ed25519 -f ${USER_CA} \
+    -C "User Certificate Authority for *.${DOMAIN}"
+}
+
+# --------------------------------------
+#
+
+COMMAND="$1"
+shift
+command_${COMMAND} $@

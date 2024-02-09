@@ -1,0 +1,6 @@
+---
+key_id: 1000
+serial: 4
+principals:
+- example
+validity: +1w
