@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, Response
+from flask import Flask, request, Response, redirect
 from . import ssh_ca
 
 base = os.path.dirname(os.path.realpath(__file__))
@@ -27,16 +27,15 @@ def webhook_post_key():
     token = request.headers["token"]
     with open(f"users/{token}.pub", "w") as f:
         f.write(request.data.decode("utf-8"))
-    resp = Response()
-    resp.status = '201'
-    return resp
+    return redirect(f"/certs/{token}", code=302)
 
-@app.route("/certs", methods=['GET'])
-def webhook_get_cert():
+@app.route("/certs/<id>", methods=['GET'])
+def webhook_get_cert(id):
     token = request.headers["token"]
+    print(f"token = {token}")
     profile = ca.profile(token)
     if profile == {}:
         return reply(None)
     else:
-        cert = sign(token, profile)
+        cert = sign(id, profile)
         return reply(cert)
