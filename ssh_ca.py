@@ -17,7 +17,7 @@ class ca:
     def profile(self, name):
         path = os.path.join(self.base, 'users', name)
         if not os.path.isfile(path):
-            return {}
+            return None
         with open(path) as f:
             return yaml.safe_load(f.read())
 

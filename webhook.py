@@ -26,7 +26,10 @@ def reply(data):
 
 @app.route("/keys", methods=['POST'])
 def webhook_post_key():
-    token  = request.headers["token"]
+    token   = request.headers["token"]
+    profile = ca.profile(token)
+    if not profile:
+        return reply(None)
     digest = ca.key(request.data)
     report = { "id": digest, "href": f"/certs/{digest}" }
     response = redirect(f"/certs/{digest}", code=302)
@@ -38,8 +41,8 @@ def webhook_get_cert(digest):
     token = request.headers["token"]
     # print(f"token = {token}")
     profile = ca.profile(token)
-    if profile == {}:
-        return reply(None)
-    else:
+    if profile:
         cert = sign(digest, profile)
         return reply(cert)
+    else:
+        return reply(None)
