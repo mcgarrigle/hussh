@@ -11,7 +11,7 @@ USER_CA="${HERE}/ca/user_ca_key"
 # --------------------------------------
 #
 
-function command_init {
+function command_ca {
   mkdir -p "${HERE}/ca" "${HERE}/keys" "${HERE}/hosts" "${HERE}/profiles" "${HERE}/users"
 
   ssh-keygen -t ecdsa -f ${HOST_CA} \
