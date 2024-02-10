@@ -10,15 +10,15 @@ ca = ssh_ca.ca(base)
 
 app = Flask(__name__)
 
-def reply(data):
-    resp = Response()
+def reply(data, code = 200):
+    response = Response()
     if data is None:
-        resp.status = '404'
-        return resp
+        response.status = 404
     else:
-        resp.status = '200'
-        resp.set_data(data)
-        return resp
+        response.status = code
+        response.content_type = "application/json"
+        response.set_data(json.dumps(data))
+    return response
 
 def authenticate(func):
     @functools.wraps(func)
@@ -29,8 +29,8 @@ def authenticate(func):
         return value
     return wrapper_decorator
 
-def sign(token, profile):
-    certfile = ca.sign(f"keys/{token}.pub", profile)
+def sign(digest, profile):
+    certfile = ca.sign(f"keys/{digest}.pub", profile)
     with open(certfile, "r") as f:
         return f.read()
 
@@ -38,18 +38,13 @@ def sign(token, profile):
 @authenticate
 def service_post_key():
     digest = ca.store_key(request.data)
-    report = { "id": digest, "href": f"/certs/{digest}" }
-    response = redirect(f"/certs/{digest}", code=302)
-    response.set_data(json.dumps(report))
-    return response
+    result = { "id": digest, "href": f"/certs/{digest}" }
+    return reply(result, 201)
 
 @app.route("/certs/<digest>", methods=['GET'])
 @authenticate
 def service_get_cert(digest):
-    token = request.headers["token"]
-    profile = ca.profile(token)
-    if profile:
-        cert = sign(digest, profile)
-        return reply(cert)
-    else:
-        return reply(None)
+    profile = ca.profile(request.headers["token"])
+    certificate = sign(digest, profile)
+    result = { "id": digest, "href": f"/certs/{digest}", "certificate": certificate }
+    return reply(result)
