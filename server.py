@@ -23,7 +23,9 @@ def reply(data, code = 200):
 def authenticate(func):
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-        profile = ca.profile(request.headers["token"])
+        token = request.headers.get("token")
+        if not token: return Response('Token Missing', 401)
+        profile = ca.profile(token)
         if not profile: return Response('Invalid Token', 401)
         value = func(*args, **kwargs)
         return value
