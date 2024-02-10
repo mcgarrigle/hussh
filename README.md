@@ -32,25 +32,25 @@ The CA public key that you need to distribute is found at ``ca/user_ca_key.pub``
 │   └── user_ca_key.pub
 ├── hosts
 ├── keys
-│   ├── dc9bfc42a8b7e5b309f31e25a4befa214d4c7e8f43825d38a6bdd763d63e1107-cert.pub
-│   └── dc9bfc42a8b7e5b309f31e25a4befa214d4c7e8f43825d38a6bdd763d63e1107.pub
+│   ├── dc9bfc42a8b7e5b309f...d63e1107-cert.pub
+│   └── dc9bfc42a8b7e5b309f...d63e1107.pub
 ├── profiles
 │   ├── default
 │   ├── example
 │   └── pete
 └── users
-    └── 1e8212feddf3b955a6bae28ee62a2225fb55c4034389498f3703b8289a1fbc51 -> ../profiles/pete
+    └── 1e8212feddf3b955a6b...9a1fbc51 -> ../profiles/pete
 ```
 
 ## Starting the Server
 
 Run in test mode:
 ```
-./server   # run with Flask
+$ ./server   # run with Flask
 ```
 or with a WSGI server:
 ```
-waitress-serve --host 127.0.0.1 --port 5000 server:app
+$ waitress-serve --host 127.0.0.1 --port 5000 server:app
 ```
 If you want to run this over TLS then you need to install a reverse proxy.
 
@@ -61,18 +61,18 @@ If you want to run this over TLS then you need to install a reverse proxy.
 
 Submit your public key:
 ```
-curl -L \
-  -H 'Token: 1e8212feddf3b955a6bae28ee62a2225fb55c4034389498f3703b8289a1fbc51' \
+$ curl -L \
+  -H 'Token: 1e8212feddf3b955a6b...9a1fbc51' \
   -H "Content-Type: text" \
   -d@$HOME/.ssh/id_rsa.pub \
   http://127.0.0.1:5000/keys
 
-{"id": "dc9bfc42a8b7e5b309f31e25a4befa214d4c7e8f43825d38a6bdd763d63e1107", "href": "/certs/dc9bfc42a8b7e5b309f31e25a4befa214d4c7e8f43825d38a6bdd763d63e1107"}
+{"id": "dc9bfc42a8b7e5b309f...d63e1107", "href": "/certs/dc9bfc42a8b7e5b309f...d63e1107"}
 
 ```
 Sign the public key you supplied above:
 ```
-curl \
-  -H 'Token: 1e8212feddf3b955a6bae28ee62a2225fb55c4034389498f3703b8289a1fbc51' \
-  http://127.0.0.1:5000/certs/dc9bfc42a8b7e5b309f31e25a4befa214d4c7e8f43825d38a6bdd763d63e1107
+$ curl \
+  -H 'Token: 1e8212feddf3b955a6b...9a1fbc51' \
+  http://127.0.0.1:5000/certs/dc9bfc42a8b7e5b309f...763d63e1107
 ```
