@@ -6,6 +6,9 @@ import re
 import yaml
 import hashlib
 import subprocess
+from datetime import datetime, timedelta
+from sshkey_tools.keys import PublicKey, PrivateKey
+from sshkey_tools.cert import SSHCertificate, CertificateFields
 from itertools import chain
 from pprint import pprint
 
@@ -13,6 +16,7 @@ class ca:
 
     def __init__(self, base):
         self.base = base
+        self.ca_user_private_key = PrivateKey.from_file(os.path.join(self.base, 'ca', "user_ca_key"))
 
     def profile(self, name):
         path = os.path.join(self.base, 'users', name)
@@ -21,31 +25,35 @@ class ca:
         with open(path) as f:
             return yaml.safe_load(f.read())
 
-    def store_key(self, data):
-        digest = hashlib.sha256(data).hexdigest()
-        path = os.path.join(self.base, 'keys', f"{digest}.pub")
+    def store_public_key(self, public_key_text):
+        digest = hashlib.sha256(public_key_text).hexdigest()
+        path   = os.path.join(self.base, 'keys', f"{digest}.pub")
         with open(path, "wb") as f:
-            f.write(data)
+            f.write(public_key_text)
         return digest
 
-    def sign(self, keyfile, profile):
-        principals = ",".join(profile["principals"])
-        args = [
-          "ssh-keygen",
-          "-s", "ca/user_ca_key",
-          "-V", profile["validity"],
-          "-I", str(profile["key_id"]),
-          "-z", str(profile["serial"]),
-          "-n", principals,
-          "-O", "clear"
-        ]
-        options = [ ("-O", f"extension:{option}") for option in profile["extensions"] ]
-        args = args + list(chain(*options))
-        args.append(keyfile)
-        result = subprocess.run(args, shell=False, capture_output=True, text=True)
-        match = re.match(r'Signed user key (.*?):', result.stderr)
-        certfile =  match.group(1)
-        return certfile
+    def retrieve_public_key(self, digest):
+        path = os.path.join(self.base, 'keys', f"{digest}.pub")
+        return PublicKey.from_file(path)
+
+    def sign(self, subject_public_key, profile):
+        cert_fields = CertificateFields(
+            serial=1234567890,
+            cert_type=1,
+            key_id="someuser@somehost",
+            principals=profile["principals"],
+            valid_after=datetime.now(),
+            valid_before=datetime.now() + timedelta(hours=8),
+            critical_options=[],
+            extensions=profile["extensions"]
+        )
+        certificate = SSHCertificate.create(
+            subject_pubkey=subject_public_key,
+            ca_privkey=self.ca_user_private_key,
+            fields=cert_fields,
+        )
+        certificate.sign()
+        return certificate.to_string()
 
 if __name__ == "__main__":
 
@@ -55,5 +63,6 @@ if __name__ == "__main__":
     profile = this.profile("1e8212feddf3b955a6bae28ee62a2225fb55c4034389498f3703b8289a1fbc51")
     keyfile = sys.argv[1]
 
-    cert = this.sign(keyfile, profile)
+    key  = PublicKey.from_file(keyfile)
+    cert = this.sign(key, profile)
     print(cert)

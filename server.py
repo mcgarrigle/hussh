@@ -1,14 +1,26 @@
 import os
+import re
 import json
-import ssh_ca
-import hashlib
 import functools
-from flask import Flask, request, Response, redirect
+from flask import Flask, request, Response
+import ssh_ca
 
 base = os.path.dirname(os.path.realpath(__file__))
 ca = ssh_ca.ca(base)
 
 app = Flask(__name__)
+
+# 'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsImlhsfsdfsdzNCwiZXhwIjoxNTMwNzksdfsdsdRF.eyJpZCI6MX0.YhZvjKiafmv-qrvAxVo7UKQuohS2vkF-9scpuqsKRuw"
+
+def bearer_token(request):
+    header = request.headers.get("Authorization")
+    if header is None:
+        return None
+    match = re.match(r'Bearer (.+)', header)
+    if match is None:
+        return None
+    token = match.group(1)
+    return token
 
 def reply(data, code = 200):
     response = Response()
@@ -23,30 +35,28 @@ def reply(data, code = 200):
 def authenticate(func):
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
-        token = request.headers.get("token")
-        if not token: return Response('Token Missing', 401)
+        token = bearer_token(request)
+        if not token:
+            return Response('Token Missing', 401)
         profile = ca.profile(token)
-        if not profile: return Response('Invalid Token', 401)
+        if not profile:
+            return Response('Invalid Token', 401)
         value = func(*args, **kwargs)
         return value
     return wrapper_decorator
 
-def sign(digest, profile):
-    certfile = ca.sign(f"keys/{digest}.pub", profile)
-    with open(certfile, "r") as f:
-        return f.read()
-
 @app.route("/keys", methods=['POST'])
 @authenticate
 def service_post_key():
-    digest = ca.store_key(request.data)
+    digest = ca.store_public_key(request.data)
     result = { "id": digest, "href": f"/certs/{digest}" }
     return reply(result, 201)
 
 @app.route("/certs/<digest>", methods=['GET'])
 @authenticate
 def service_get_cert(digest):
-    profile = ca.profile(request.headers["token"])
-    certificate = sign(digest, profile)
+    public_key = ca.retrieve_public_key(digest)
+    profile = ca.profile(bearer_token(request))
+    certificate = ca.sign(public_key, profile)
     result = { "id": digest, "href": f"/certs/{digest}", "certificate": certificate }
     return reply(result)
