@@ -14,14 +14,15 @@ def cli():
 def key(file):
     with open(file) as f:
         public_key_text = f.read()
-    response = requests.post(f"{url}/keys", headers={"token":token}, data=public_key_text)
-    digest = json.loads(response.text)["id"]
-    print(digest)
+    response = requests.post(f"{url}/keys", headers={"Authorization":f"Bearer {token}"}, data=public_key_text)
+    reply = json.loads(response.text)
+    print(reply["id"])
 
 @cli.command()
 @click.argument('key')
 def cert(key):
-    response = requests.get(f"{url}/certs/{key}", headers={"token":token})
+    response = requests.get(f"{url}/certs/{key}", headers={"Authorization":f"Bearer {token}"})
+    print(response.text)
     reply = json.loads(response.text)
     print(reply["certificate"])
 
