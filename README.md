@@ -102,7 +102,7 @@ ln -s profiles/alice users/de07bfdba346deb20705712c2ea07e7191d57f07d793c8c0698de
 Submit your public key:
 ```
 $ curl \
-  -H 'Authorization: Bearer1e8212feddf3b955a6b...9a1fbc51' \
+  -H 'Authorization: Bearer 1e8212feddf3b955a6b...9a1fbc51' \
   -H "Content-Type: text" \
   -d@$HOME/.ssh/id_rsa.pub \
   http://127.0.0.1:5000/keys
@@ -112,6 +112,6 @@ $ curl \
 Sign the public key you supplied above:
 ```
 $ curl \
-  -H 'Authorization: Bearer1e8212feddf3b955a6b...9a1fbc51' \
+  -H 'Authorization: Bearer 1e8212feddf3b955a6b...9a1fbc51' \
   http://127.0.0.1:5000/certs/dc9bfc42a8b7e5b309f...763d63e1107
 ```
