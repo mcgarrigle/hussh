@@ -6,17 +6,17 @@ from flask import Flask, request, Response
 import ssh_ca
 
 base = os.path.dirname(os.path.realpath(__file__))
-ca = ssh_ca.ca(base)
+ca = ssh_ca.CA(base)
 
 app = Flask(__name__)
 
-# 'Authorization': "Bearer eyJhbGciOiJIUzI1NiIsImlhsfsdfsdzNCwiZXhwIjoxNTMwNzksdfsdsdRF.eyJpZCI6MX0.YhZvjKiafmv-qrvAxVo7UKQuohS2vkF-9scpuqsKRuw"
+# 'Authorization': "Bearer eyJhbGciOiJI...uqsKRuw"
 
-def bearer_token(request):
-    header = request.headers.get("Authorization")
-    if header is None:
+def bearer_token(rq):
+    authorization = rq.headers.get("Authorization")
+    if authorization is None:
         return None
-    match = re.match(r'Bearer (.+)', header)
+    match = re.match(r'Bearer (.+)', authorization)
     if match is None:
         return None
     token = match.group(1)

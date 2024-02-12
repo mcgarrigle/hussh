@@ -2,21 +2,18 @@
 
 import sys
 import os
-import re
-import yaml
 import hashlib
-import subprocess
 from datetime import datetime, timedelta
+import yaml
 from sshkey_tools.keys import PublicKey, PrivateKey
 from sshkey_tools.cert import SSHCertificate, CertificateFields
-from itertools import chain
-from pprint import pprint
 
-class ca:
+class CA:
 
     def __init__(self, base):
         self.base = base
-        self.ca_user_private_key = PrivateKey.from_file(os.path.join(self.base, 'ca', "user_ca_key"))
+        path = os.path.join(self.base, 'ca', "user_ca_key")
+        self.ca_user_private_key = PrivateKey.from_file(path)
 
     def profile(self, name):
         path = os.path.join(self.base, 'users', name)
@@ -57,8 +54,8 @@ class ca:
 
 if __name__ == "__main__":
 
-    base = os.path.dirname(os.path.realpath(__file__))
-    this = ca(base)
+    here = os.path.dirname(os.path.realpath(__file__))
+    this = CA(here)
 
     profile = this.profile("1e8212feddf3b955a6bae28ee62a2225fb55c4034389498f3703b8289a1fbc51")
     keyfile = sys.argv[1]
