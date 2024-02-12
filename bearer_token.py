@@ -1,5 +1,5 @@
 class BearerTokenAuth:
-    """Attaches HTTP Basic Authentication to the given Request object."""
+    """Attaches HTTP Bearer Token Authentication to the given Request object."""
 
     def __init__(self, token):
         self.token = token
