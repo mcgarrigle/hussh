@@ -1,7 +1,7 @@
 import unittest
 from schema import Schema
 
-class TestStringMethods(unittest.TestCase):
+class TestSchema(unittest.TestCase):
 
     def setUp(self):
         self.schema = Schema(name=str, age=int)
