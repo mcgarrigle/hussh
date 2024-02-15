@@ -5,6 +5,8 @@ import os
 import hashlib
 from datetime import datetime, timedelta
 import yaml
+import json
+from schema import Schema
 from sshkey_tools.keys import PublicKey, PrivateKey
 from sshkey_tools.cert import SSHCertificate, CertificateFields
 
@@ -14,6 +16,10 @@ class CA:
         self.base = base
         path = os.path.join(self.base, 'ca', "user_ca_key")
         self.ca_user_private_key = PrivateKey.from_file(path)
+        self.public_key_schema = Schema(name=str, key=str)
+
+    def key_store_path(self, digest):
+        return os.path.join(self.base, 'keys', f"{digest}.json")
 
     def profile(self, name):
         path = os.path.join(self.base, 'users', name)
@@ -22,16 +28,18 @@ class CA:
         with open(path) as f:
             return yaml.safe_load(f.read())
 
-    def store_public_key(self, public_key_text):
-        digest = hashlib.sha256(public_key_text).hexdigest()
-        path   = os.path.join(self.base, 'keys', f"{digest}.pub")
-        with open(path, "wb") as f:
-            f.write(public_key_text)
+    def store_public_key(self, name,  public_key_text):
+        digest = hashlib.sha256(public_key_text.encode(encoding="utf-8")).hexdigest()
+        path = self.key_store_path(digest)
+        obj = { "id":digest, "name":name, "key":public_key_text }
+        with open(path, "w") as f:
+            f.write(json.dumps(obj))
         return digest
 
     def retrieve_public_key(self, digest):
-        path = os.path.join(self.base, 'keys', f"{digest}.pub")
-        return PublicKey.from_file(path)
+        path = self.key_store_path(digest)
+        with open(path, "r") as f:
+            return json.loads(f.read())
 
     def sign(self, subject_public_key, profile):
         cert_fields = CertificateFields(
@@ -55,11 +63,17 @@ class CA:
 if __name__ == "__main__":
 
     here = os.path.dirname(os.path.realpath(__file__))
-    this = CA(here)
+    ca = CA(here)
 
-    profile = this.profile("1e8212feddf3b955a6bae28ee62a2225fb55c4034389498f3703b8289a1fbc51")
+    profile = ca.profile("1e8212feddf3b955a6bae28ee62a2225fb55c4034389498f3703b8289a1fbc51")
     keyfile = sys.argv[1]
 
-    key  = PublicKey.from_file(keyfile)
-    cert = this.sign(key, profile)
-    print(cert)
+    digest = ca.store_public_key(keyfile, "ssh public key")
+    print(digest)
+
+    keyblob = ca.retrieve_public_key("f7fd17cd432bc2587b2679cc05e1b8d55a2805eef1cc2f8a93bab243aff72b5d")
+    print(keyblob)
+    
+    #key  = PublicKey.from_string(keyfile)
+    #cert = ca.sign(key, profile)
+    #print(cert)

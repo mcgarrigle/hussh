@@ -32,6 +32,14 @@ def reply(data, code = 200):
         response.set_data(json.dumps(data))
     return response
 
+def validate_public_key(text):
+    struct = json.loads(text)
+    fields = ["id", "name", "key"]
+    if len(struct) != len(fields):
+        return False
+    checks  = [ type(struct.get(f)) == str for f in fields ]
+    return all(checks)
+
 def authenticate(func):
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
@@ -48,9 +56,12 @@ def authenticate(func):
 @app.route("/keys", methods=['POST'])
 @authenticate
 def service_post_key():
-    digest = ca.store_public_key(request.data)
-    result = { "id": digest, "href": f"/certs/{digest}" }
-    return reply(result, 201)
+    if validate_public_key(request.data):
+        digest = ca.store_public_key(request.data)
+        result = { "id": digest, "href": f"/certs/{digest}" }
+        return reply(result, 201)
+    else:
+        return reply(None)
 
 @app.route("/certs/<digest>", methods=['GET'])
 @authenticate

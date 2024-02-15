@@ -115,3 +115,8 @@ $ curl \
   -H 'Authorization: Bearer 1e8212feddf3b955a6b...9a1fbc51' \
   http://127.0.0.1:5000/certs/dc9bfc42a8b7e5b309f...763d63e1107
 ```
+
+Unit tests
+```
+$ python -m unittest discover
+```
