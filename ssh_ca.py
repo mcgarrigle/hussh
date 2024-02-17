@@ -34,14 +34,15 @@ class CA:
         obj = { "id":digest, "name":name, "key":public_key_text }
         with open(path, "w") as f:
             f.write(json.dumps(obj))
-        return digest
+        return obj
 
     def retrieve_public_key(self, digest):
         path = self.key_store_path(digest)
         with open(path, "r") as f:
             return json.loads(f.read())
 
-    def sign(self, subject_public_key, profile):
+    def sign(self, subject_public_key_text, profile):
+        subject_public_key = PublicKey.from_string(subject_public_key_text)
         cert_fields = CertificateFields(
             serial=1234567890,
             cert_type=1,
@@ -59,21 +60,3 @@ class CA:
         )
         certificate.sign()
         return certificate.to_string()
-
-if __name__ == "__main__":
-
-    here = os.path.dirname(os.path.realpath(__file__))
-    ca = CA(here)
-
-    profile = ca.profile("1e8212feddf3b955a6bae28ee62a2225fb55c4034389498f3703b8289a1fbc51")
-    keyfile = sys.argv[1]
-
-    digest = ca.store_public_key(keyfile, "ssh public key")
-    print(digest)
-
-    keyblob = ca.retrieve_public_key("f7fd17cd432bc2587b2679cc05e1b8d55a2805eef1cc2f8a93bab243aff72b5d")
-    print(keyblob)
-    
-    #key  = PublicKey.from_string(keyfile)
-    #cert = ca.sign(key, profile)
-    #print(cert)

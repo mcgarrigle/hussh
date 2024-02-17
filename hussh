@@ -17,19 +17,22 @@ def cli():
 def key(file):
     with open(file, "r") as f:
         public_key_text = f.read()
-    response = requests.post(f"{url}/keys", auth=BearerTokenAuth(token), data=public_key_text)
+    blob = {"name":file, "key":public_key_text}
+    response = requests.post(f"{url}/keys", auth=BearerTokenAuth(token), data=json.dumps(blob))
     reply = json.loads(response.text)
-    print(reply["id"])
 
 @cli.command()
 @click.argument('key')
 def cert(key):
     response = requests.get(f"{url}/certs/{key}", auth=BearerTokenAuth(token))
     reply = json.loads(response.text)
-    print(reply["certificate"])
+    path, extension = os.path.splitext(reply["name"])
+    certpath = path + "-cert" + extension
+    print(certpath)
+    with open(certpath, "w") as f:
+        f.write(reply["certificate"])
 
 if __name__ == '__main__':
     url   = os.environ.get('HUSSH_URL', 'http://127.0.0.1:5000')
     token = os.environ.get('HUSSH_TOKEN') or sys.exit('HUSSH_TOKEN missing')
-    print("t={token}")
     cli()

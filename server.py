@@ -34,7 +34,7 @@ def reply(data, code = 200):
 
 def validate_public_key(text):
     struct = json.loads(text)
-    fields = ["id", "name", "key"]
+    fields = ["name", "key"]
     if len(struct) != len(fields):
         return False
     checks  = [ type(struct.get(f)) == str for f in fields ]
@@ -56,18 +56,17 @@ def authenticate(func):
 @app.route("/keys", methods=['POST'])
 @authenticate
 def service_post_key():
-    if validate_public_key(request.data):
-        digest = ca.store_public_key(request.data)
-        result = { "id": digest, "href": f"/certs/{digest}" }
-        return reply(result, 201)
-    else:
-        return reply(None)
+    struct = json.loads(request.data)
+    result = ca.store_public_key(struct["name"], struct["key"])
+    return reply(result, 201)
 
 @app.route("/certs/<digest>", methods=['GET'])
 @authenticate
 def service_get_cert(digest):
-    public_key = ca.retrieve_public_key(digest)
+    result = ca.retrieve_public_key(digest)
+    public_key = result["key"]
     profile = ca.profile(bearer_token(request))
     certificate = ca.sign(public_key, profile)
-    result = { "id": digest, "href": f"/certs/{digest}", "certificate": certificate }
+    result["certificate"] = certificate 
+    result["href"] = f"/certs/{digest}"
     return reply(result)

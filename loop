@@ -1,4 +1,6 @@
+./server
 while true; do
   watch -g ls -lr
-  sleep 4
+  pkill flask
+  ./server
 done
