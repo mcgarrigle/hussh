@@ -4,9 +4,12 @@ import json
 import functools
 from flask import Flask, request, Response
 import ssh_ca
+from schema import Schema
 
 base = os.path.dirname(os.path.realpath(__file__))
 ca = ssh_ca.CA(base)
+
+key_schema = Schema(name=str, key=str)
 
 app = Flask(__name__)
 
@@ -32,14 +35,6 @@ def reply(data, code = 200):
         response.set_data(json.dumps(data))
     return response
 
-def validate_public_key(text):
-    struct = json.loads(text)
-    fields = ["name", "key"]
-    if len(struct) != len(fields):
-        return False
-    checks  = [ type(struct.get(f)) == str for f in fields ]
-    return all(checks)
-
 def authenticate(func):
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
@@ -57,8 +52,11 @@ def authenticate(func):
 @authenticate
 def service_post_key():
     struct = json.loads(request.data)
-    result = ca.store_public_key(struct["name"], struct["key"])
-    return reply(result, 201)
+    if struct == key_schema:
+        result = ca.store_public_key(struct["name"], struct["key"])
+        return reply(result, 201)
+    else:
+        return reply(None, 422)
 
 @app.route("/certs/<digest>", methods=['GET'])
 @authenticate

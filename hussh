@@ -8,6 +8,10 @@ import click
 
 from bearer_token import BearerTokenAuth
 
+def fail(s):
+    print(s)
+    exit(1)
+
 @click.group()
 def cli():
     pass
@@ -19,7 +23,10 @@ def key(file):
         public_key_text = f.read()
     blob = {"name":file, "key":public_key_text}
     response = requests.post(f"{url}/keys", auth=BearerTokenAuth(token), data=json.dumps(blob))
+    if response.status_code != 201:
+        fail(f"error in request {response.status_code}")
     reply = json.loads(response.text)
+    print(reply["id"])
 
 @cli.command()
 @click.argument('key')
