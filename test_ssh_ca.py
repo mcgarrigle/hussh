@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+
 import os
 import unittest
 from sshkey_tools.keys import PublicKey, PrivateKey
 from sshkey_tools.cert import SSHCertificate, CertificateFields
+from datetime import datetime, timedelta
 from ssh_ca import CA
 
 class TestSSHCA(unittest.TestCase):
@@ -13,6 +16,15 @@ class TestSSHCA(unittest.TestCase):
     def setUp(self):
         here = os.path.dirname(os.path.realpath(__file__))
         self.ca = CA(here)
+
+    def test_time_from(self):
+        # return datetime.now() + timedelta(hours=8),
+        now = datetime.now()
+        self.assertEqual(self.ca.time_from(now, "1h"), now + timedelta(hours=1))
+        self.assertEqual(self.ca.time_from(now, "1d"), now + timedelta(hours=24))
+        self.assertEqual(self.ca.time_from(now, "2d"), now + timedelta(hours=48))
+        self.assertEqual(self.ca.time_from(now, "1w"), now + timedelta(hours=24 * 7))
+        self.assertEqual(self.ca.time_from(now, "2w"), now + timedelta(hours=24 * 14))
 
     def test_store_public_key(self):
         result = self.ca.store_public_key("this key name", "ssh public key")
@@ -33,7 +45,7 @@ class TestSSHCA(unittest.TestCase):
                                   'permit-port-forwarding', 
                                   'permit-pty',
                                   'permit-user-rc'],
-                   'validity': '+1d'}
+                   'validity': '1d'}
         cert = self.ca.sign(key, profile)
         self.assertTrue("rsa-sha2-512-cert-v01@openssh.com" in cert)
 

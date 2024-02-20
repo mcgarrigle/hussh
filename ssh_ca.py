@@ -2,6 +2,7 @@
 
 import sys
 import os
+import re
 import hashlib
 from datetime import datetime, timedelta
 import yaml
@@ -17,6 +18,20 @@ class CA:
         path = os.path.join(self.base, 'ca', "user_ca_key")
         self.ca_user_private_key = PrivateKey.from_file(path)
         self.public_key_schema = Schema(name=str, key=str)
+
+    def time_from(self, now: datetime, delta : str) -> datetime:
+        m = re.match('(\d+)([hdw])', delta)
+        n = int(m[1])
+        if m[2] == "h":
+            return now + timedelta(hours=n)
+        if m[2] == "d":
+            return now + timedelta(hours=n * 24)
+        if m[2] == "w":
+            return now + timedelta(hours=n * 24 * 7)
+        return now
+
+    def validity(self, delta):
+        return self.time_from(datetime.now(), delta)
 
     def key_store_path(self, digest):
         return os.path.join(self.base, 'keys', f"{digest}.json")
@@ -49,7 +64,7 @@ class CA:
             key_id="someuser@somehost",
             principals=profile["principals"],
             valid_after=datetime.now(),
-            valid_before=datetime.now() + timedelta(hours=8),
+            valid_before=self.validity(profile["validity"]),
             critical_options=[],
             extensions=profile["extensions"]
         )
