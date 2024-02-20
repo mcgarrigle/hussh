@@ -22,7 +22,8 @@ Note the key digest. When you want to generate a new certificate use:
 ```
 hussh cert \
    1e8212feddf3b955a6bae28ee62a2225fb55c4034389498f3703b8289a1fbc51 \
-   > ~/.ssh/id_rsa-cert.pub
+
+# will write ~/.ssh/id_rsa-cert.pub
 ```
 
 ## Installation
