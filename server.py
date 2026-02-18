@@ -5,13 +5,6 @@ import base64
 from command import Command
 
 
-def publickey(path):
-    with open(path, "r") as f:
-        key_str   = f.read().strip().split()
-        key_bytes = base64.b64decode(key_str[1])
-        return paramiko.RSAKey(data=key_bytes)
-
-
 class Server(paramiko.ServerInterface):
 
     def __init__(self):
@@ -19,13 +12,22 @@ class Server(paramiko.ServerInterface):
         self.username = None
         self.key      = None
 
+    def publickey(self, path):
+        with open(path, "r") as f:
+            key_str   = f.read().strip().split()
+            key_bytes = base64.b64decode(key_str[1])
+            return paramiko.RSAKey(data=key_bytes)
+
     def check_auth_publickey(self, username, key):
-        authorized_key = publickey(f"keys/{username}.pub")
-        if key == authorized_key:
-            self.username = username
-            self.key      = key
-            return paramiko.AUTH_SUCCESSFUL
-        else:
+        try:
+            authorized_key = self.publickey(f"keys/{username}.pub")
+            if key == authorized_key:
+                self.username = username
+                self.key      = key
+                return paramiko.AUTH_SUCCESSFUL
+            else:
+                return paramiko.AUTH_FAILED
+        except Exception:
             return paramiko.AUTH_FAILED
 
     def check_auth_password(self, username, password):

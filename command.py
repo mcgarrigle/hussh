@@ -1,3 +1,5 @@
+import os
+
 from ssh_ca import CA
 
 class Command:
@@ -6,7 +8,8 @@ class Command:
         self.username = username
         self.key      = key
         self.channel  = channel
-        self.ca       = CA('.')
+        self.here     = os.path.dirname(os.path.realpath(__file__))
+        self.ca       = CA(self.here)
 
     def cert(self):
         user_public_key = self.ca.user_public_key(self.username)

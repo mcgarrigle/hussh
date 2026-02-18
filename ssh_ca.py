@@ -3,9 +3,7 @@
 import sys
 import os
 import re
-import hashlib
 import yaml
-import json
 
 from datetime import datetime, timedelta
 from sshkey_tools.keys import PublicKey, PrivateKey
