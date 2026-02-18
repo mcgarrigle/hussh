@@ -24,11 +24,9 @@ Installation:
 ```
 git clone git@github.com:mcgarrigle/hussh.git
 cd hussh/
-python -m venv .venv
-. .venv/bin/activate
-pip3 install paramiko pyaml sshkey-tools
-./setup ca
-./hussh 
+./setup install   # python venv and dependencies
+./setup ca        # create user and host keys
+./setup run       # start SSH server
 ```
 
 ## Configuring Users
@@ -58,7 +56,7 @@ validity: +1d
 
 ## Configuring Servers
 
-Sample cloud-init user-data file that copies the ssh_ca_user_key and adds a sshd_config fragment to tell ssh to use it.
+Sample cloud-init user-data file that copies the ``ssh_ca_user_key`` and adds a ``sshd_config`` fragment to tell ssh to use it.
 
 ```
 #cloud-config
