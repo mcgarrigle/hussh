@@ -1,0 +1,13 @@
+---
+key_id: 1000
+serial: 4
+principals:
+- pete
+- root
+extensions:
+- permit-X11-forwarding
+- permit-agent-forwarding
+- permit-port-forwarding
+- permit-pty
+- permit-user-rc
+validity: 1d

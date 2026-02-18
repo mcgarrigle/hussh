@@ -1,0 +1,6 @@
+__*
+*_key
+*.pub
+keys/host.rsa
+keys/host.rsa.pub
+logs/*.log

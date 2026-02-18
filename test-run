@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+clear
+
+tmux send-keys -t 1 C-c
+tmux send-keys -t 1 ./hussh.py Enter
+sleep 1
+# ssh pete@127.0.0.1 -p 5555 fail
+ssh pete@127.0.0.1 -p 5555 cert
