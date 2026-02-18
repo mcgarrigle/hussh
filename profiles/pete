@@ -10,4 +10,4 @@ extensions:
 - permit-port-forwarding
 - permit-pty
 - permit-user-rc
-validity: 1d
+validity: 2w
