@@ -25,6 +25,8 @@ class CA:
             return now + timedelta(hours=n * 24)
         if m[2] == "w":
             return now + timedelta(hours=n * 24 * 7)
+        if m[2] == "y":
+            return now + timedelta(hours=n * 24 * 365)
         return now
 
     def validity(self, delta):
@@ -39,13 +41,16 @@ class CA:
         if not os.path.isfile(path):
             return None
         with open(path) as f:
-            return yaml.safe_load(f.read())
+            p = yaml.safe_load(f.read())
+            p["username"] = username
+            return p
 
     def sign(self, user_public_key, profile):
+        key_id = profile["username"] + "@hussh"
         cert_fields = CertificateFields(
             serial=1234567890,
             cert_type=1,
-            key_id="someuser@somehost",
+            key_id=key_id,
             principals=profile["principals"],
             valid_after=datetime.now(),
             valid_before=self.validity(profile["validity"]),
