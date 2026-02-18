@@ -24,10 +24,11 @@ Installation:
 ```
 git clone git@github.com:mcgarrigle/hussh.git
 cd hussh/
-
+python -m venv .venv
+. .venv/bin/activate
+pip3 install paramiko pyaml sshkey-tools
 ./setup ca
-./setup install
-./setup run
+./hussh 
 ```
 
 ## Configuring Users
@@ -53,4 +54,22 @@ extensions:
 - permit-pty
 - permit-user-rc
 validity: +1d
+```
+
+## Configuring Servers
+
+Sample cloud-init user-data file that copies the ssh_ca_user_key and adds a sshd_config fragment to tell ssh to use it.
+
+```
+#cloud-config
+
+write_files:
+- path: /etc/ssh/ssh_ca_user_key.pub
+  content: "${SSH_CA_USER_KEY}"
+  owner: root:root
+  permissions: '0644'
+- path: /etc/ssh/sshd_config.d/10-ssh-certs.conf
+  content: "TrustedUserCAKeys /etc/ssh/ssh_ca_user_key.pub"
+  owner: root:root
+  permissions: '0644'
 ```
