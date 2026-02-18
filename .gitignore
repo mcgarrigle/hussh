@@ -1,6 +1,7 @@
 __*
-*_key
-*.pub
+ca/*_key
+ca/*_key.pub
+keys/*.pub
 keys/host.rsa
 keys/host.rsa.pub
 logs/*.log
