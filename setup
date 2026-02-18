@@ -21,6 +21,17 @@ function setup_ca {
     -C "User Certificate Authority for *.${DOMAIN}"
 }
 
+function setup_install {
+  python -m venv .venv
+  . .venv/bin/activate
+  pip3 install paramiko pyaml sshkey-tools
+}
+
+function setup_run {
+  . .venv/bin/activate
+  ./hussh
+}
+
 # --------------------------------------
 #
 

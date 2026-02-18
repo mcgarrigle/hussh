@@ -24,11 +24,10 @@ Installation:
 ```
 git clone git@github.com:mcgarrigle/hussh.git
 cd hussh/
-python -m venv .venv
-. .venv/bin/activate
-pip3 install paramiko pyaml sshkey-tools
+
 ./setup ca
-./hussh 
+./setup install
+./setup run
 ```
 
 ## Configuring Users

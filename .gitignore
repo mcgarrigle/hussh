@@ -1,4 +1,5 @@
 __*
+.venv
 ca/*_key
 ca/*_key.pub
 keys/*.pub
