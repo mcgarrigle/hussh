@@ -14,9 +14,10 @@ class Server(paramiko.ServerInterface):
 
     def publickey(self, path):
         with open(path, "r") as f:
-            key_str   = f.read().strip().split()
-            key_bytes = base64.b64decode(key_str[1])
-            return paramiko.RSAKey(data=key_bytes)
+            key_parts = f.read().strip().split()
+            key_type  = key_parts[0]
+            key_bytes = base64.b64decode(key_parts[1])
+            return paramiko.PKey.from_type_string(key_type, key_bytes)
 
     def check_auth_publickey(self, username, key):
         try:
