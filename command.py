@@ -20,6 +20,8 @@ class Command:
 
     def command_secret(self, line):
         args = line.split(" ", 3)
+        if args[1] == "list":
+            return self.secret.ls()
         if args[1] == "set":
             return self.secret.set(args[2], args[3])
         if args[1] == "get":

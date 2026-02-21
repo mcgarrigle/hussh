@@ -1,5 +1,6 @@
 import os
 
+from glob import glob
 from cryptography.fernet import Fernet
 
 class Secret:
@@ -13,6 +14,11 @@ class Secret:
     def secret(self, key, mode):
         path = os.path.join(self.here, 'secrets', key)
         return open(path, mode)
+
+    def ls(self):
+        path = os.path.join(self.here, 'secrets', '*')
+        secrets = map(os.path.basename, glob(path))
+        return '\n'.join(secrets)
 
     def set(self, key, plaintext):
         f = Fernet(self.aes_key)
