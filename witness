@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+
+function run_tests {
+  echo restarting
+  ./hussh
+}
+
+run_tests &
+PID=$!; echo pid = $PID
+
+while true; do
+  watch -g find . -ls > /dev/null
+  echo killing!
+  kill -9 $PID
+  run_tests &
+  PID=$!; echo pid = $PID
+  sleep 1
+done
