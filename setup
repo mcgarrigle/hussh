@@ -13,6 +13,8 @@ USER_CA="${HERE}/ca/ssh_ca_user_key"
 function setup_ca {
   mkdir -p "${HERE}/ca" "${HERE}/keys" "${HERE}/profiles" "${HERE}/logs"
 
+  openssl rand -base64 32 > "${HERE}/keys/aes.key"
+
   ssh-keygen -t rsa -f "${HERE}/keys/host.rsa"
 
   ssh-keygen -t ecdsa -f ${HOST_CA} \

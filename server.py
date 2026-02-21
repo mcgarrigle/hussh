@@ -45,8 +45,9 @@ class Server(paramiko.ServerInterface):
         return True
 
     def check_channel_exec_request(self, channel, cmd):
-        command = Command(self.username, self.key, channel)
-        command.exec(cmd.decode()) 
+        command = Command(self.username)
+        res = command.exec(cmd.decode()) 
+        channel.send(res + "\n")
         self.event.set()
         return True
 

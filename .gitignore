@@ -1,8 +1,9 @@
 __*
 .venv
+logs/*.log
 ca/*_key
 ca/*_key.pub
-keys/*.pub
-keys/host.rsa
-keys/host.rsa.pub
-logs/*.log
+!keys/.empty
+keys/*
+!secrets/.empty
+secrets/*
