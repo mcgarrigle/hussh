@@ -5,10 +5,8 @@ from secret import Secret
 
 class Command:
 
-    def __init__(self, username, key, channel):
+    def __init__(self, username):
         self.username = username
-        self.key      = key
-        self.channel  = channel
         self.here     = os.path.dirname(os.path.realpath(__file__))
         self.ca       = CA(self.here)
         self.secret   = Secret(self.here)
@@ -37,5 +35,4 @@ class Command:
             return f"ERROR: unknown command '{cmd}'"
 
     def exec(self, cmd):
-        res = self.dispatch(cmd)
-        self.channel.send(res + "\n")
+        return self.dispatch(cmd)

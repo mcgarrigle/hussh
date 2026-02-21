@@ -25,6 +25,28 @@ rsa-sha2-512-cert-v01@openssh.com AAAAIXJzY...fFPjxxZ6YCQ==
 $ ssh tt -p 5555 cert > ~/.ssh/id_rsa-cert.pub
 ```
 
+Examine certificate
+```
+$ ssh hussh.mac.wales -p 5555 'cert' | ssh-keygen -L -f -
+(stdin):1:
+        Type: ssh-rsa-cert-v01@openssh.com user certificate
+        Public key: RSA-CERT SHA256:DxaUZa5YluXOyv5YPEaGsOVNuzTa0pcnyCREEZr0Rl0
+        Signing CA: ED25519 SHA256:WDtuDx4wXDPt3Z5GncZ2keoZP6+AWGxgxyUrWhBS4rQ (using ssh-ed25519)
+        Key ID: "pete@hussh"
+        Serial: 1234567890
+        Valid: from 2026-02-21T20:14:07 to 2026-03-07T20:14:07
+        Principals: 
+                pete
+                root
+        Critical Options: (none)
+        Extensions: 
+                permit-X11-forwarding
+                permit-agent-forwarding
+                permit-port-forwarding
+                permit-pty
+                permit-user-rc
+```
+
 ## Secret Server
 
 In addition to a SSH CA, HUSSH can act as a secret store, saving secrets in encrypted form.
