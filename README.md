@@ -2,31 +2,61 @@
 
 A SSH server dispensing SSH user certificates.
 
-## Use case
+## SSH Certificate CA
 
 You have a community of engineers to need access to a fleet of servers, on 
 which you have deployed a CA public key.
 
 This system allows an engineer to:
 
+* Authenticate to HUSSH with their SSH private/public keys
+
 * Retrieve a certificate derived from the public key - with 
-  restrictions applied by a system administrator.
+  restrictions applied by a system administrator via a defined
+  profile
+
+* This certificate will allow login to any machine that trusts it
 
 Usage:
 ```
-ssh tt -p 5555 cert
+$ ssh hussh.mac.wales -p 5555 cert
 rsa-sha2-512-cert-v01@openssh.com AAAAIXJzY...fFPjxxZ6YCQ==
 
-ssh tt -p 5555 cert > ~/.ssh/id_rsa-cert.pub
+$ ssh tt -p 5555 cert > ~/.ssh/id_rsa-cert.pub
+```
+
+## Secret Server
+
+In addition to a SSH CA, HUSSH can act as a secret store, saving secrets in encrypted form.
+
+Usage:
+```
+# set/update secret
+
+$ ssh hussh.mac.wales -p 5555 secret set production.redis.credentials admin:passw0rd
+
+# get secret
+
+$ CREDENTIALS=$(ssh hussh.mac.wales -p 5555 secret set production.redis.credentials)
+
+$ echo $CREDENTIALS
+admin:passw0rd
+
+# list secrets
+
+$ ssh hussh.mac.wales -p 5555 secret list
+production.redis.credentials
+test.redis.credentials
+development.redis.credentials
 ```
 
 Installation:
 ```
-git clone git@github.com:mcgarrigle/hussh.git
-cd hussh/
-./setup install   # python venv and dependencies
-./setup ca        # create user and host keys
-./setup run       # start SSH server
+$ git clone git@github.com:mcgarrigle/hussh.git
+$ cd hussh/
+$ ./setup install   # python venv and dependencies
+$ ./setup ca        # create user and host keys
+$ ./setup run       # start SSH server
 ```
 
 ## Configuring Users
@@ -36,7 +66,7 @@ usernames ``alice`` and ``root``.
 
 1. Allow access to HUSSH
 ```
-cp id_rsa.pub keys/alice.pub  # copy alice's public key so she can connect to the HUSSH server
+$ cp id_rsa.pub keys/alice.pub  # copy alice's public key so she can connect to the HUSSH server
 ```
 2. Create a profile for this user at ``profiles/alice``:
 ```
