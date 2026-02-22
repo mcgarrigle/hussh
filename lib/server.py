@@ -3,15 +3,16 @@ import paramiko
 import base64
 
 from time import sleep
-from command import Command
-
+from lib.command import Command
 
 class Server(paramiko.ServerInterface):
 
-    def __init__(self):
+    def __init__(self, home):
+        self.home     = home
         self.event    = threading.Event()
         self.username = None
         self.key      = None
+        self.logger   = paramiko.util.get_logger("paramiko")
 
     def publickey(self, path):
         with open(path, "r") as f:
@@ -22,7 +23,7 @@ class Server(paramiko.ServerInterface):
 
     def check_auth_publickey(self, username, key):
         try:
-            authorized_key = self.publickey(f"keys/{username}.pub")
+            authorized_key = self.publickey(f"{self.home}/keys/{username}.pub")
             if key == authorized_key:
                 self.username = username
                 self.key      = key
@@ -45,14 +46,15 @@ class Server(paramiko.ServerInterface):
     def check_channel_pty_request(self, channel, term, width, height, pixelwidth, pixelheight, modes):
         return True
 
-    def check_channel_exec_request(self, channel, cmd):
+    def check_channel_exec_request(self, channel, line):
         try:
-            command = Command(self.username)
-            result = command.exec(cmd.decode()) 
+            command = Command(self.home, self.username)
+            result = command.exec(line.decode()) 
             channel.settimeout(10.0)
             channel.sendall(result + "\n")
             channel.send_exit_status(0)
-        except:
+        except Exception as e:
+            self.logger.error(f"error {e.args[0]}")
             channel.send_exit_status(255)
         channel.close()
         sleep(1)          # wait for channel to be sent

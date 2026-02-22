@@ -11,9 +11,9 @@ from sshkey_tools.cert import SSHCertificate, CertificateFields
 
 class CA:
 
-    def __init__(self, base):
-        self.base = base
-        path = os.path.join(self.base, 'ca', "ssh_ca_user_key")
+    def __init__(self, home):
+        self.home = home
+        path = os.path.join(self.home, 'ca', "ssh_ca_user_key")
         self.ca_user_private_key = PrivateKey.from_file(path)
 
     def time_from(self, now: datetime, delta : str) -> datetime:
@@ -33,11 +33,11 @@ class CA:
         return self.time_from(datetime.now(), delta)
 
     def user_public_key(self, username):
-        path = os.path.join(self.base, 'keys', f"{username}.pub")
+        path = os.path.join(self.home, 'keys', f"{username}.pub")
         return PublicKey.from_file(path)
 
     def profile(self, username):
-        path = os.path.join(self.base, 'profiles', username)
+        path = os.path.join(self.home, 'profiles', username)
         if not os.path.isfile(path):
             return None
         with open(path) as f:

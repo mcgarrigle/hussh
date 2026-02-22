@@ -5,18 +5,18 @@ from cryptography.fernet import Fernet
 
 class Secret:
 
-    def __init__(self, here):
-        self.here = here
-        path = os.path.join(self.here, 'keys', 'aes.key')
+    def __init__(self, home):
+        self.home = home
+        path = os.path.join(self.home, 'keys', 'aes.key')
         with open(path, 'r') as k:
             self.aes_key = k.read()
 
     def secret(self, key, mode):
-        path = os.path.join(self.here, 'secrets', key)
+        path = os.path.join(self.home, 'secrets', key)
         return open(path, mode)
 
     def ls(self):
-        path = os.path.join(self.here, 'secrets', '*')
+        path = os.path.join(self.home, 'secrets', '*')
         secrets = map(os.path.basename, glob(path))
         return '\n'.join(secrets)
 

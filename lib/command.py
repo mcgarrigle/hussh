@@ -1,15 +1,17 @@
 import os
+import paramiko
 
-from ssh_ca import CA
-from secret import Secret
+from lib.ssh_ca import CA
+from lib.secret import Secret
 
 class Command:
 
-    def __init__(self, username):
+    def __init__(self, home, username):
         self.username = username
-        self.here     = os.path.dirname(os.path.realpath(__file__))
-        self.ca       = CA(self.here)
-        self.secret   = Secret(self.here)
+        self.home     = home
+        self.ca       = CA(self.home)
+        self.secret   = Secret(self.home)
+        self.logger   = paramiko.util.get_logger("paramiko")
 
     def command_cert(self):
         user_public_key = self.ca.user_public_key(self.username)
@@ -26,14 +28,11 @@ class Command:
             return self.secret.get(args[2])
         raise ValueError("unknown command")
 
-    def dispatch(self, line):
+    def exec(self, line):
         args = line.split()
         if args[0] == "cert":
             return self.command_cert()
         if args[0] == "secret":
             return self.command_secret(line)
         else:
-            return f"ERROR: unknown command '{cmd}'"
-
-    def exec(self, cmd):
-        return self.dispatch(cmd)
+            raise ValueError(f"unknown command '{line}'")
