@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+import os
+import sys
 import logging
 import socket
-import sys
 import threading
 import paramiko
 import base64
@@ -15,7 +16,8 @@ class HUSSH:
 
     def __init__(self, home):
         self.home = home
-        self.host_key = paramiko.RSAKey(filename=f'{home}/keys/host.rsa')
+        path = os.path.join(self.home, 'keys', 'host.rsa')
+        self.host_key = paramiko.RSAKey(filename=path)
         self.session_queue = Queue()
         self.logger = paramiko.util.get_logger("paramiko")
 
