@@ -22,12 +22,18 @@ Usage:
 $ ssh hussh.mac.wales -p 5555 cert
 rsa-sha2-512-cert-v01@openssh.com AAAAIXJzY...fFPjxxZ6YCQ==
 
-$ ssh tt -p 5555 cert > ~/.ssh/id_rsa-cert.pub
+$ ssh hussh.mac.wales -p 5555 cert > ~/.ssh/id_rsa-cert.pub
+
+# or set the endpoint and use the hussh wrapper script
+
+export HUSSH_URI=ssh://hussh.mac.wales:5555
+
+./hussh cert
 ```
 
 Examine certificate
 ```
-$ ssh hussh.mac.wales -p 5555 'cert' | ssh-keygen -L -f -
+$ hussh cert | ssh-keygen -L -f -
 (stdin):1:
         Type: ssh-rsa-cert-v01@openssh.com user certificate
         Public key: RSA-CERT SHA256:DxaUZa5YluXOyv5YPEaGsOVNuzTa0pcnyCREEZr0Rl0
@@ -55,18 +61,18 @@ Usage:
 ```
 # set/update secret
 
-$ ssh hussh.mac.wales -p 5555 secret set production.redis.credentials admin:passw0rd
+$ hussh secret set production.redis.credentials admin:passw0rd
 
 # get secret
 
-$ CREDENTIALS=$(ssh hussh.mac.wales -p 5555 secret set production.redis.credentials)
+$ CREDENTIALS=$(hussh secret get production.redis.credentials)
 
 $ echo $CREDENTIALS
 admin:passw0rd
 
 # list secrets
 
-$ ssh hussh.mac.wales -p 5555 secret list
+$ hussh secret list
 production.redis.credentials
 test.redis.credentials
 development.redis.credentials

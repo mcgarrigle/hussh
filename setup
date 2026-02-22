@@ -31,7 +31,7 @@ function setup_install {
 
 function setup_run {
   . .venv/bin/activate
-  ./hussh
+  ./husshd
 }
 
 # --------------------------------------
