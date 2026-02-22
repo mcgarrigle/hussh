@@ -6,11 +6,13 @@ import paramiko
 
 from lib.hussh import HUSSH
 
+home = os.path.dirname(os.path.realpath(__file__))
+
 logging.basicConfig()
-paramiko.util.log_to_file('logs/hussh.log', level='INFO')
+logfile = os.path.join(home, 'logs', 'hussh.log')
+paramiko.util.log_to_file(logfile, level='INFO')
 
 def main():
-    home = os.path.dirname(os.path.realpath(__file__))
     hussh = HUSSH(home)
     hussh.listen()
 
