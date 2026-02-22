@@ -3,13 +3,13 @@
 import os
 import unittest
 from datetime import datetime, timedelta
-from ssh_ca import CA
+from ca       import CA
 
 class TestSSHCA(unittest.TestCase):
 
     def setUp(self):
         here = os.path.dirname(os.path.realpath(__file__))
-        fixtures = os.path.join(here, "fixtures")
+        fixtures = os.path.join(here, "../fixtures")
         self.ca = CA(fixtures)
 
     def test_time_from(self):

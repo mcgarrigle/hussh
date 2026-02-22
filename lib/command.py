@@ -1,7 +1,7 @@
 import os
 import paramiko
 
-from lib.ssh_ca import CA
+from lib.ca     import CA
 from lib.secret import Secret
 
 class Command:
