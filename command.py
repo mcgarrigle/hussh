@@ -24,6 +24,7 @@ class Command:
             return self.secret.set(args[2], args[3])
         if args[1] == "get":
             return self.secret.get(args[2])
+        raise ValueError("unknown command")
 
     def dispatch(self, line):
         args = line.split()

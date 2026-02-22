@@ -2,6 +2,7 @@ import threading
 import paramiko
 import base64
 
+from time import sleep
 from command import Command
 
 
@@ -45,10 +46,17 @@ class Server(paramiko.ServerInterface):
         return True
 
     def check_channel_exec_request(self, channel, cmd):
-        command = Command(self.username)
-        res = command.exec(cmd.decode()) 
-        channel.send(res + "\n")
-        self.event.set()
+        try:
+            command = Command(self.username)
+            result = command.exec(cmd.decode()) 
+            channel.settimeout(10.0)
+            channel.sendall(result + "\n")
+            channel.send_exit_status(0)
+        except:
+            channel.send_exit_status(255)
+        channel.close()
+        sleep(1)          # wait for channel to be sent
+        self.event.set()  # trigger termination
         return True
 
     def check_channel_shell_request(self, channel):

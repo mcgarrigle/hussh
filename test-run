@@ -1,8 +1,12 @@
 #!/usr/bin/bash
-clear
 
+clear
 tmux send-keys -t 1 C-c
-tmux send-keys -t 1 ./hussh.py Enter
+tmux send-keys -t 1 './setup run' Enter
 sleep 1
-# ssh pete@127.0.0.1 -p 5555 fail
+
+ssh pete@127.0.0.1 -p 5555 fail
+echo $?
 ssh pete@127.0.0.1 -p 5555 cert
+ssh pete@127.0.0.1 -p 5555 secret list
+ssh pete@127.0.0.1 -p 5555 secret get prod.redis.username

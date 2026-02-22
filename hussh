@@ -17,7 +17,6 @@ logging.basicConfig()
 paramiko.util.log_to_file('logs/hussh.log', level='INFO')
 logger = paramiko.util.get_logger("paramiko")
 
-# ssh-keygen -f keys/host.rsa
 host_key = paramiko.RSAKey(filename='keys/host.rsa')
 
 session_queue = Queue()
