@@ -9,11 +9,14 @@ from lib.hussh import HUSSH
 home = os.path.dirname(os.path.realpath(__file__))
 port = int(os.getenv("HUSSHD_PORT", "5555"))
 
-logging.basicConfig()
 logfile = os.path.join(home, 'logs', 'hussh.log')
+
+logging.basicConfig()
 paramiko.util.log_to_file(logfile, level='INFO')
+logger = paramiko.util.get_logger("paramiko")
 
 def main():
+    logger.info(f"husshd listening on port {port}")
     hussh = HUSSH(home)
     hussh.listen(port)
 
