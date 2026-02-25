@@ -45,10 +45,10 @@ class HUSSH:
         except KeyboardInterrupt:
             sys.exit(0)
 
-    def listen(self):
+    def listen(self, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind(('', 5555))
+        sock.bind(('', port))
         sock.listen(100)
 
         threading.Thread(target=self.accept_and_queue, args=(sock,), daemon=True).start()

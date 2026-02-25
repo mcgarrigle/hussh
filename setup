@@ -1,13 +1,5 @@
 #!/usr/bin/bash
 
-THIS=$(realpath "$0")
-HERE=$(dirname "${THIS}")
-
-DOMAIN="${DOMAIN:-mac.wales}"
-
-HOST_CA="${HERE}/ca/ssh_ca_host_key"
-USER_CA="${HERE}/ca/ssh_ca_user_key"
-
 # --------------------------------------
 
 function setup_ca {
@@ -25,17 +17,31 @@ function setup_ca {
 
 function setup_install {
   python -m venv .venv
-  . .venv/bin/activate
+  . ${HERE}/.venv/bin/activate
   pip3 install paramiko pyaml sshkey-tools
 }
 
 function setup_run {
-  . .venv/bin/activate
+	echo "// husshd"
+	echo "---------------------------"
+  echo "port: ${HUSSHD_PORT}"
+	echo
+  . ${HERE}/.venv/bin/activate
   ./husshd
 }
 
 # --------------------------------------
 #
+
+THIS=$(realpath "$0")
+HERE=$(dirname "${THIS}")
+
+DOMAIN="${DOMAIN:-mac.wales}"
+
+HOST_CA="${HERE}/ca/ssh_ca_host_key"
+USER_CA="${HERE}/ca/ssh_ca_user_key"
+
+HUSSHD_PORT="${HUSSHD_PORT:-5555}"
 
 COMMAND="$1"
 shift
